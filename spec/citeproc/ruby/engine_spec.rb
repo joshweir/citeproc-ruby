@@ -88,6 +88,27 @@ module CiteProc
         it 'can handle literal dates' do
           expect(cp.render(:bibliography, :id => 'literal_date')).to eq(['Derrida, J. (sometime in 1967). L’écriture et la différence (1st ed.). Paris: Éditions du Seuil.'])
         end
+
+        context "when a dependent style is used" do
+          let(:cp_dep) { CiteProc::Processor.new :style => 'dependent/apa-dependent',
+                                                 :format => 'text' }
+          before(:each) do
+            cp_dep << items(:grammatology).data
+            cp_dep << items(:knuth1968).data
+            cp_dep << items(:difference).data
+            cp_dep << items(:literal_date).data
+          end
+
+          it 'renders the indepent_parent reference for the given id' do
+            expect(cp_dep.render(:bibliography, :id => 'grammatology')).to eq(['Derrida, J. (1976). Of Grammatology (corrected ed.). Baltimore: Johns Hopkins University Press.'])
+            expect(cp_dep.render(:citation, :id => 'grammatology', :locator => '3-4')).to eq('(Derrida, 1976, pp. 3-4)')
+            expect(cp_dep.render(:bibliography, :id => 'knuth1968')).to eq(['Knuth, D. (1968). The art of computer programming (Vol. 1). Boston: Addison-Wesley.'])
+
+            cp_dep.engine.format = 'html'
+            expect(cp_dep.render(:bibliography, :id => 'knuth1968')).to eq(['Knuth, D. (1968). <i>The art of computer programming</i> (Vol. 1). Boston: Addison-Wesley.'])
+            expect(cp_dep.render(:citation, :id => 'knuth1968', :locator => '23')).to eq('(Knuth, 1968, p. 23)')
+          end
+        end
       end
     end
 

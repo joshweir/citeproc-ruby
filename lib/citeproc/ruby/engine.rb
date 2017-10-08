@@ -86,9 +86,10 @@ module CiteProc
 
       # @return [String, Array<String>]
       def render(mode, data)
+
         case mode
         when :bibliography
-          node = style.bibliography
+          node = independent_style.bibliography
 
           data.map do |item|
             item.data = processor[item.id].dup
@@ -96,7 +97,7 @@ module CiteProc
           end
 
         when :citation
-          node = style.citation
+          node = independent_style.citation
 
           data.each do |item|
             item.data = processor[item.id].dup
@@ -109,11 +110,18 @@ module CiteProc
         end
       end
 
+      def independent_style
+        @style.independent? ?
+            @style : @style.independent_parent
+      end
 
       def update!
         renderer.format = processor.options[:format]
         renderer.locale = processor.options[:locale]
 
+        #@style = processor.options[:style].is_a? CSL::Style ?
+        #           processor.options[:style] :
+        #           CSL::Style.load processor.options[:style]
         if processor.options[:style].is_a? CSL::Style
           @style = processor.options[:style]
         else
