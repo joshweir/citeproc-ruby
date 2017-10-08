@@ -119,9 +119,6 @@ module CiteProc
         renderer.format = processor.options[:format]
         renderer.locale = processor.options[:locale]
 
-        #@style = processor.options[:style].is_a? CSL::Style ?
-        #           processor.options[:style] :
-        #           CSL::Style.load processor.options[:style]
         if processor.options[:style].is_a? CSL::Style
           @style = processor.options[:style]
         else
